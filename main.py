@@ -1,15 +1,13 @@
-import requests
-from SLEZ import Session
 
-terms = ""
+from SLEZ import Session
 
 
 def search_terms_gen(term):
     terms = ""
-    list = term.split()
+    list_terms = term.split()
     # print(list)
 
-    for term in list:
+    for term in list_terms:
         terms = terms + f"{term}+"
 
     if terms[-1] == "+":
@@ -22,12 +20,11 @@ def search_torrents(term):
     search_term = search_terms_gen(term)
     # print(search_term)
 
-    # headerz = {
-    #     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
-    # }
-    # RARBG DOES NOT LIKE TO BE SCRAPED AND GIVES CAPTCHA
-    # url = f"https://rarbggo.org/torrents.php?search={search_term}&category[]=17&category[]=44&category[]=45&category[]=47&category[]=50&category[]=51&category[]=52&category[]=42&category[]=46&category[]=54"
-    # url = f"https://magnetdl.torrentbay.to/search/?q={search_term}&m=1&x=0&y=0"
+    # headerz = { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)
+    # Chrome/106.0.0.0 Safari/537.36' } RARBG DOES NOT LIKE TO BE SCRAPED AND GIVES CAPTCHA url =
+    # f"https://rarbggo.org/torrents.php?search={search_term}&category[]=17&category[]=44&category[]=45&category[
+    # ]=47&category[]=50&category[]=51&category[]=52&category[]=42&category[]=46&category[]=54" url =
+    # f"https://magnetdl.torrentbay.to/search/?q={search_term}&m=1&x=0&y=0"
 
     url_ext = f"https://ext.torrentbay.to/search/?q={search_term}"
 
@@ -51,11 +48,11 @@ def search_torrents(term):
 
     selenium_session.browse(url_ext)
 
-    # magnet links from rarbg
-    links_xpath_rr = "//td[contains(@class,'lista') and not(contains(@valign,'top'))]//a[contains(@href,'/torrent/') and not(contains(@href,'#comments'))]"
+    # magnet links from rarbg links_xpath_rr = "//td[contains(@class,'lista') and not(contains(@valign,'top'))]//a[
+    # contains(@href,'/torrent/') and not(contains(@href,'#comments'))]"
 
     # magnet links from https://magnetdl.torrentbay.to/
-    links_xpath_mg = "//a[contains(@href,'magnet:?')]"
+    # links_xpath_mg = "//a[contains(@href,'magnet:?')]"
 
     # ext is a lot better considering the magnet links are  already available in just one click...
 
@@ -73,5 +70,4 @@ def search_torrents(term):
         # print(x, z)
         torrents[z] = x
     print(torrents)
-
     selenium_session.close_driver()
