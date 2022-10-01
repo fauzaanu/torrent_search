@@ -1,5 +1,4 @@
 import requests
-
 from SLEZ import Session
 
 terms = ""
@@ -8,52 +7,71 @@ terms = ""
 def search_terms_gen(term):
     terms = ""
     list = term.split()
-    #print(list)
+    # print(list)
 
     for term in list:
-        terms = terms+f"{term}+"
+        terms = terms + f"{term}+"
 
     if terms[-1] == "+":
         x = len(terms)
-        terms = terms[:x-1]
+        terms = terms[:x - 1]
     return terms
 
 
-search_term = search_terms_gen("rush hour")
-print(search_term)
+def search_torrents(term):
+    search_term = search_terms_gen(term)
+    # print(search_term)
 
+    # headerz = {
+    #     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
+    # }
+    # RARBG DOES NOT LIKE TO BE SCRAPED AND GIVES CAPTCHA
+    # url = f"https://rarbggo.org/torrents.php?search={search_term}&category[]=17&category[]=44&category[]=45&category[]=47&category[]=50&category[]=51&category[]=52&category[]=42&category[]=46&category[]=54"
+    # url = f"https://magnetdl.torrentbay.to/search/?q={search_term}&m=1&x=0&y=0"
 
-# RARBG DOES NOT LIKE TO BE SCRAPED AND GIVES CAPTCHA
-# url = f"https://rarbggo.org/torrents.php?search={search_term}&category[]=17&category[]=44&category[]=45&category[]=47&category[]=50&category[]=51&category[]=52&category[]=42&category[]=46&category[]=54"
+    url_ext = f"https://ext.torrentbay.to/search/?q={search_term}"
 
-url = f"https://magnetdl.torrentbay.to/search/?q={search_term}&m=1&x=0&y=0"
+    windows = True
 
+    if windows:
 
-"magnet:?xt=urn:btih:5AB48D67FB69A914353CD86E9A417DC57CF809BC"
+        username = 'Fauzaanu'
 
-headerz = {
-    'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
-}
+        browser = r"C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
+        profile = rf'C:\Users\{username}\AppData\Local\BraveSoftware\Brave-Browser\User Data\Profile 3'
 
+    else:
 
-username = 'Fauzaanu'
+        username = 'fauzaanu'
 
-browser = r"C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
-profile = rf'C:\Users\{username}\AppData\Local\BraveSoftware\Brave-Browser\User Data\Profile 3'
+        browser = rf"/opt/brave.com/brave/brave"
+        profile = rf'/home/{username}/.config/BraveSoftware/Brave-Browser/Default'
 
-selenium_session = Session(browser, profile, headless=False, delay=0)
-selenium_session.browse(url)
+    selenium_session = Session(browser, profile, headless=True, delay=0)
 
-# magnet links from rarbg
-links_xpath_rr = "//td[contains(@class,'lista') and not(contains(@valign,'top'))]//a[contains(@href,'/torrent/') and not(contains(@href,'#comments'))]"
+    selenium_session.browse(url_ext)
 
-# magnet links from https://magnetdl.torrentbay.to/
-links_xpath_mg = "//a[contains(@href,'magnet:?')]"
+    # magnet links from rarbg
+    links_xpath_rr = "//td[contains(@class,'lista') and not(contains(@valign,'top'))]//a[contains(@href,'/torrent/') and not(contains(@href,'#comments'))]"
 
-obj = selenium_session.wait_for_selject(links_xpath_mg,multiple=True)
-for ob in obj:
-    x = selenium_session.scrape_attribute(ob,attribute='href',tag='a')
-    print(x)
+    # magnet links from https://magnetdl.torrentbay.to/
+    links_xpath_mg = "//a[contains(@href,'magnet:?')]"
 
+    # ext is a lot better considering the magnet links are  already available in just one click...
 
-selenium_session.close_driver()
+    links_xpath_xt = "//a[contains(@href,'magnet:?')]"
+
+    obj = selenium_session.wait_for_selject(links_xpath_xt, multiple=True)
+
+    torrents = {}
+    for ob in obj:
+        x = selenium_session.scrape_attribute(ob, attribute='href', tag='a')
+        name_xt = f"//tr//a[contains(@href,'{x}')]/../..//b"
+        text_sel = selenium_session.wait_for_selject(name_xt)
+        z = selenium_session.scrape_content(text_sel)
+        # print(z)
+        # print(x, z)
+        torrents[z] = x
+    print(torrents)
+
+    selenium_session.close_driver()

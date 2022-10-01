@@ -342,6 +342,7 @@ class Session:
         :return:
         """
         html_string = selject.get_attribute('innerHTML')
+        #print(html_string)
         soup = BeautifulSoup(html_string, "html.parser").prettify()
 
         html_string = html_string.replace("&amp;", "")
