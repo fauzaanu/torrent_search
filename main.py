@@ -39,7 +39,7 @@ def search_torrents(term):
 
     else:
 
-        username = 'fauzaanu'
+        username = 'root'
 
         browser = rf"/opt/brave.com/brave/brave"
         profile = rf'/home/{username}/.config/BraveSoftware/Brave-Browser/Default'
